@@ -2,7 +2,7 @@ import random
 import math
 from graph import *
 
-def generate_graph(n, connection_radius=0.4, obstacle_prob=0.2):
+def generate_graph(n, obstacle_prob=0.2):
     g = Graph()
 
     # создаем узлы
@@ -20,8 +20,11 @@ def generate_graph(n, connection_radius=0.4, obstacle_prob=0.2):
             x2, y2 = g.nodes[j]
             dist = math.hypot(x1 - x2, y1 - y2)
 
-            if dist < connection_radius and random.random() > obstacle_prob:
+            if random.random() > obstacle_prob:
                 cost = dist * random.uniform(0.8, 1.2)
                 g.add_edge(i, j, cost)
+            else:
+                # препятствие, не добавляем ребро
+                g.add_obstacle("Obstacle_{}_{}".format(i, j), (x1 + x2) / 2, (y1 + y2) / 2)
 
     return g

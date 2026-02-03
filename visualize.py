@@ -28,6 +28,11 @@ def visualize(graph, mst=None, path=None):
     for node, (x, y) in graph.nodes.items():
         plt.scatter(x, y, color="black")
         plt.text(x + 0.01, y + 0.01, str(node))
+    
+    # препятствия
+    for obs_id, (x, y) in graph.obstacles.items():
+        plt.scatter(x, y, color="brown", marker="x", s=100)
+        plt.text(x + 0.01, y + 0.01, str(obs_id), color="brown")
 
     plt.title("Mars Colony Infrastructure")
     plt.axis("off")
