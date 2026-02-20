@@ -10,11 +10,13 @@ def _build_adj_from_mst(graph, mst):
 
 
 def dijkstra(graph, start, mst=None):
+    if start not in graph.nodes:
+        raise ValueError(f"Start node {start} does not exist in graph")
+
     dist = {v: float("inf") for v in graph.nodes}
     prev = {v: None for v in graph.nodes}
     dist[start] = 0
 
-    # If MST is provided, find path only on MST edges.
     edges = _build_adj_from_mst(graph, mst) if mst is not None else graph.edges
 
     pq = [(0, start)]
@@ -32,3 +34,20 @@ def dijkstra(graph, start, mst=None):
                 heapq.heappush(pq, (dist[v], v))
 
     return dist, prev
+
+
+def reconstruct_path(prev, start, goal):
+    if goal not in prev:
+        return []
+
+    path = []
+    cur = goal
+    while cur is not None:
+        path.append(cur)
+        cur = prev[cur]
+    path.reverse()
+
+    if not path or path[0] != start:
+        return []
+
+    return path

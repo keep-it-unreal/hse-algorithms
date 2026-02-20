@@ -1,27 +1,52 @@
+import argparse
 import random
-import math
-import heapq
-import matplotlib.pyplot as plt
-from generator import *
-from shortest_path import *
-from visualize import *
-from mst import *
 
-if __name__ == "__main__":
-    random.seed(42)
+from generator import generate_graph
+from mst import kruskal_mst
+from shortest_path import dijkstra, reconstruct_path
+from visualize import visualize
+from server import run_server
 
-    graph = generate_graph(n=15)
+
+def run_visual_demo(seed=42, n=15, start=0, goal=8):
+    random.seed(seed)
+
+    graph = generate_graph(n=n)
     mst = kruskal_mst(graph)
 
-    start, goal = 0, 8
     dist, prev = dijkstra(graph, start, mst)
-
-    # восстановление пути
-    path = []
-    cur = goal
-    while cur is not None:
-        path.append(cur)
-        cur = prev[cur]
-    path.reverse()
+    path = reconstruct_path(prev, start, goal)
 
     visualize(graph, mst=mst, path=path)
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Graph app")
+    subparsers = parser.add_subparsers(dest="command")
+
+    visualize_parser = subparsers.add_parser("visualize", help="Run visualization demo")
+    visualize_parser.add_argument("--seed", type=int, default=42)
+    visualize_parser.add_argument("--n", type=int, default=15)
+    visualize_parser.add_argument("--start", type=int, default=0)
+    visualize_parser.add_argument("--goal", type=int, default=8)
+
+    server_parser = subparsers.add_parser("server", help="Run HTTP server")
+    server_parser.add_argument("--host", default="127.0.0.1")
+    server_parser.add_argument("--port", type=int, default=8000)
+
+    args = parser.parse_args()
+
+    if args.command == "server":
+        run_server(host=args.host, port=args.port)
+        return
+
+    run_visual_demo(
+        seed=getattr(args, "seed", 42),
+        n=getattr(args, "n", 15),
+        start=getattr(args, "start", 0),
+        goal=getattr(args, "goal", 8),
+    )
+
+
+if __name__ == "__main__":
+    main()
