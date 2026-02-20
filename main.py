@@ -13,8 +13,8 @@ if __name__ == "__main__":
     graph = generate_graph(n=15)
     mst = kruskal_mst(graph)
 
-    start, goal = 0, 10
-    dist, prev = dijkstra(graph, start)
+    start, goal = 0, 8
+    dist, prev = dijkstra(graph, start, mst)
 
     # восстановление пути
     path = []

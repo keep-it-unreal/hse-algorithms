@@ -1,5 +1,4 @@
 import random
-import math
 from graph import *
 
 def generate_graph(n, obstacle_prob=0.2):
@@ -18,10 +17,8 @@ def generate_graph(n, obstacle_prob=0.2):
 
             x1, y1 = g.nodes[i]
             x2, y2 = g.nodes[j]
-            dist = math.hypot(x1 - x2, y1 - y2)
-
             if random.random() > obstacle_prob:
-                cost = dist * random.uniform(0.8, 1.2)
+                cost = random.randint(1, 1000)
                 g.add_edge(i, j, cost)
             else:
                 # препятствие, не добавляем ребро

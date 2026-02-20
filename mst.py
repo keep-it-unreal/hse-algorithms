@@ -16,7 +16,7 @@ class DSU:
 
 def kruskal_mst(graph):
     edges = []
-
+    # собираем все ребра в виде (вес, u, v), удаляем дубликаты
     for u in graph.edges:
         for v, w in graph.edges[u]:
             if u < v:
