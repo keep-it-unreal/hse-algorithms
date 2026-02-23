@@ -60,9 +60,6 @@ class GraphApiHandler(BaseHTTPRequestHandler):
         try:
             n = int(params.get("n", [15])[0])
             obstacle_prob = float(params.get("obstacle_prob", [0.2])[0])
-            seed_param = params.get("seed", [None])[0]
-            if seed_param is not None:
-                random.seed(int(seed_param))
 
             graph = generate_graph(n=n, obstacle_prob=obstacle_prob)
             self._send_json(200, {"graph": graph.to_dict()})
@@ -82,8 +79,7 @@ class GraphApiHandler(BaseHTTPRequestHandler):
             try:
                 graph = self._parse_graph_payload(body)
                 mst = kruskal_mst(graph)
-                mst_payload = [{"u": u, "v": v, "w": w} for u, v, w in mst]
-                self._send_json(200, {"mst": mst_payload})
+                self._send_json(200, {"mst": mst})
             except Exception as exc:
                 self._send_json(400, {"error": str(exc)})
             return
@@ -94,18 +90,19 @@ class GraphApiHandler(BaseHTTPRequestHandler):
                     self._send_json(400, {"error": "Request body must be a JSON object"})
                     return
 
-                graph = self._parse_graph_payload(body)
-
                 if "start" not in body or "goal" not in body:
                     self._send_json(400, {"error": "Fields 'start' and 'goal' are required"})
+                    return
+                if "mst" not in body:
+                    self._send_json(400, {"error": "Field 'mst' is required"})
                     return
 
                 start = int(body["start"])
                 goal = int(body["goal"])
-                use_mst = self._to_bool(body.get("use_mst", True), default=True)
 
-                mst = kruskal_mst(graph) if use_mst else None
-                dist, prev = dijkstra(graph, start, mst)
+                mst = body.get("mst")
+                
+                dist, prev = dijkstra(start, mst)
                 path = reconstruct_path(prev, start, goal)
 
                 distance = dist.get(goal, float("inf"))
@@ -116,7 +113,6 @@ class GraphApiHandler(BaseHTTPRequestHandler):
                     {
                         "start": start,
                         "goal": goal,
-                        "use_mst": use_mst,
                         "reachable": reachable,
                         "distance": distance if reachable else None,
                         "path": path,

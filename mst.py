@@ -1,6 +1,6 @@
 class DSU:
-    def __init__(self, n):
-        self.parent = list(range(n))
+    def __init__(self, nodes):
+        self.parent = {i: i for i in nodes}
 
     def find(self, x):
         if self.parent[x] != x:
@@ -25,13 +25,12 @@ def kruskal_mst(graph):
     edges.sort()
 
     node_ids = list(graph.nodes.keys())
-    node_to_idx = {node_id: idx for idx, node_id in enumerate(node_ids)}
 
-    dsu = DSU(len(node_ids))
+    dsu = DSU(node_ids)
     mst = []
 
     for w, u, v in edges:
-        if dsu.union(node_to_idx[u], node_to_idx[v]):
+        if dsu.union(u, v):
             mst.append((u, v, w))
 
     return mst

@@ -8,13 +8,12 @@ from visualize import visualize
 from server import run_server
 
 
-def run_visual_demo(seed=42, n=15, start=0, goal=8):
-    random.seed(seed)
+def run_visual_demo(n=15, start=0, goal=8):
 
     graph = generate_graph(n=n)
     mst = kruskal_mst(graph)
 
-    dist, prev = dijkstra(graph, start, mst)
+    dist, prev = dijkstra(start, mst)
     path = reconstruct_path(prev, start, goal)
 
     visualize(graph, mst=mst, path=path)
@@ -25,7 +24,6 @@ def main():
     subparsers = parser.add_subparsers(dest="command")
 
     visualize_parser = subparsers.add_parser("visualize", help="Run visualization demo")
-    visualize_parser.add_argument("--seed", type=int, default=42)
     visualize_parser.add_argument("--n", type=int, default=15)
     visualize_parser.add_argument("--start", type=int, default=0)
     visualize_parser.add_argument("--goal", type=int, default=8)
@@ -41,10 +39,9 @@ def main():
         return
 
     run_visual_demo(
-        seed=getattr(args, "seed", 42),
-        n=getattr(args, "n", 15),
+        n=getattr(args, "n", 5),
         start=getattr(args, "start", 0),
-        goal=getattr(args, "goal", 8),
+        goal=getattr(args, "goal", 3),
     )
 
 

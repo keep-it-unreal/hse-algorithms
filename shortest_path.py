@@ -1,26 +1,27 @@
 import heapq
 
 
-def _build_adj_from_mst(graph, mst):
-    adj = {v: [] for v in graph.nodes}
+def _build_adj_from_mst(node_ids, mst):
+    adj = {v: [] for v in node_ids}
     for u, v, w in mst:
         adj[u].append((v, w))
         adj[v].append((u, w))
     return adj
 
 
-def dijkstra(graph, start, mst=None):
-    if start not in graph.nodes:
+def dijkstra(start, mst):
+    node_ids = set(x[0] for x in mst) | set(x[1] for x in mst)
+    if start not in node_ids:
         raise ValueError(f"Start node {start} does not exist in graph")
 
-    dist = {v: float("inf") for v in graph.nodes}
-    prev = {v: None for v in graph.nodes}
+    dist = {v: float("inf") for v in node_ids}
+    prev = {v: None for v in node_ids}
     dist[start] = 0
 
-    edges = _build_adj_from_mst(graph, mst) if mst is not None else graph.edges
+    edges = _build_adj_from_mst(node_ids, mst)
 
     pq = [(0, start)]
-
+    
     while pq:
         cur_dist, u = heapq.heappop(pq)
 
