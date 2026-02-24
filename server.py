@@ -84,6 +84,41 @@ class GraphApiHandler(BaseHTTPRequestHandler):
                 self._send_json(400, {"error": str(exc)})
             return
 
+        if parsed.path == "/graph/remove-node":
+            try:
+                if not isinstance(body, dict):
+                    self._send_json(400, {"error": "Request body must be a JSON object"})
+                    return
+                if "node_id" not in body:
+                    self._send_json(400, {"error": "Field 'node_id' is required"})
+                    return
+
+                graph = self._parse_graph_payload(body)
+                node_id = int(body["node_id"])
+                graph.remove_node(node_id)
+                self._send_json(200, {"graph": graph.to_dict()})
+            except Exception as exc:
+                self._send_json(400, {"error": str(exc)})
+            return
+
+        if parsed.path == "/graph/remove-edge":
+            try:
+                if not isinstance(body, dict):
+                    self._send_json(400, {"error": "Request body must be a JSON object"})
+                    return
+                if "u" not in body or "v" not in body:
+                    self._send_json(400, {"error": "Fields 'u' and 'v' are required"})
+                    return
+
+                graph = self._parse_graph_payload(body)
+                u = int(body["u"])
+                v = int(body["v"])
+                graph.remove_edge(u, v)
+                self._send_json(200, {"graph": graph.to_dict()})
+            except Exception as exc:
+                self._send_json(400, {"error": str(exc)})
+            return
+
         if parsed.path == "/shortest-path":
             try:
                 if not isinstance(body, dict):

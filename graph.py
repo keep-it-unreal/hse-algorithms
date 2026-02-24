@@ -15,6 +15,29 @@ class Graph:
     def add_obstacle(self, obstacle_id, x, y):
         self.obstacles[obstacle_id] = (x, y)
 
+    def remove_node(self, node_id):
+        if node_id not in self.nodes:
+            raise ValueError(f"Node {node_id} does not exist")
+
+        del self.nodes[node_id]
+        del self.edges[node_id]
+
+        for u in self.edges:
+            self.edges[u] = [(v, w) for v, w in self.edges[u] if v != node_id]
+
+    def remove_edge(self, u, v):
+        if u not in self.nodes or v not in self.nodes:
+            raise ValueError("Both nodes must exist in graph")
+
+        before_u = len(self.edges[u])
+        before_v = len(self.edges[v])
+
+        self.edges[u] = [(nbr, w) for nbr, w in self.edges[u] if nbr != v]
+        self.edges[v] = [(nbr, w) for nbr, w in self.edges[v] if nbr != u]
+
+        if len(self.edges[u]) == before_u and len(self.edges[v]) == before_v:
+            raise ValueError(f"Edge ({u}, {v}) does not exist")
+
     def to_dict(self):
         unique_edges = []
         for u in self.edges:
